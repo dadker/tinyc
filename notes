@@ -1,0 +1,7 @@
+add float back
+add string and char
+fix digit and identifier def
+operator precedence
+symbol table
+%token <intval> CONSTANT;
+%token <id>     ID;
