@@ -63,7 +63,7 @@ IfStatement:    IF '(' Expression ')' Statement
 
 WhileStatement: WHILE '(' Expression ')' Statement
 
-ReturnStatement:    RETURN ';' {$$ = return($2);}
+ReturnStatement:    RETURN ';' {$$ = ret($2);}
     | RETURN Expression ';'
 
 StatementList:
