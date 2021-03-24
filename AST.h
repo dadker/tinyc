@@ -2,7 +2,7 @@ typedef struct AST AST;
 
 struct AST {
     int lineno;
-    enum {k_IntLiteral, k_Identifier, k_Addition, k_Subtraction, k_lessThan, k_lessThanEqual, k_greaterThan, k_greaterThanEqual, k_equal, k_notEqual} kind;
+    enum {k_IntLiteral, k_Identifier, k_Addition, k_Subtraction, k_lessThan, k_lessThanEqual, k_greaterThan, k_greaterThanEqual, k_equal, k_notEqual, k_return, k_assign} kind;
     union {
         char *identifier;
         int intLiteral;
@@ -95,5 +95,23 @@ AST *notEqual(AST *node1, AST *node2)
     e->kind = k_notEqual;
     e->val.binary.lhs = node1;
     e->val.binary.rhs = node2;
+    return e;
+}
+
+AST *assign(AST *node1, AST *node2)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_assign;
+    e->val.binary.lhs = node1;
+    e->val.binary.rhs = node2;
+    return e;
+}
+
+AST *ret(AST *node1)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_return;
+    e->val.binary.lhs = node1;
+    e->val.binary.rhs = NULL;
     return e;
 }
