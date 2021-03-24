@@ -2,9 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "y.tab.h"
-#define YY_USER_ACTION yylloc.first_line = yylloc.last_line == yylineno;
 %}
-%option yylineno
 DIGIT   [0-9]
 ID      [a-z][a-z0-9]*
 %%

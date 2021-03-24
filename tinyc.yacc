@@ -2,42 +2,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "ST.h"
 #include "AST.h"
-#include "CG.h"
-
-install (char *sym_name)
-{
-    symrec *s;
-    s = getsym(sym_name);
-    if(s == 0) s = putsym(sym_name);
-    else printf("%s is already defined\n", sym_name);
-}
- %}
+%}
 %union{
     int intval;
     char *id;
-    struct EXP *exp;
-    struct STMT *stmt;
-    struct FUNC *func;
-    struct PROG *prog;
+    struct AST *node;
 }
-%locations
 %start Program
 %token CHAR ELSE FLOAT IF INT RETURN VOID WHILE MAIN EQ GE GT LE LT NE
 %token <intval> CONSTANT;
 %token <id>     ID;
-%type <exp> PrimaryExpression FunctionArgList FunctionCall UnaryExpression MultiplicativeExpression AdditiveExpression ComparisonExpression Expression
-%type <stmt> AssignmentStatment IfStatement WhileStatement ReturnStatement StatementList BlockStatement EmptyStatement Statement
-%type <func> ReturnType FunctionParameter FunctionParameterList VariableDefinition VariableDefinitionList FunctionStatementList FunctionBody FunctionDefinition
-%type <prog> FunctionDefinitionList MainFunction Program
+%type <node> PrimaryExpression FunctionArgList FunctionCall UnaryExpression MultiplicativeExpression AdditiveExpression ComparisonExpression Expression
+%type <node> AssignmentStatment IfStatement WhileStatement ReturnStatement StatementList BlockStatement EmptyStatement Statement
+%type <node> ReturnType FunctionParameter FunctionParameterList VariableDefinition VariableDefinitionList FunctionStatementList FunctionBody FunctionDefinition
+%type <node> FunctionDefinitionList MainFunction Program
 %%
 Type: INT
     | CHAR
     | FLOAT
 
-PrimaryExpression:  CONSTANT { $$ = makeEXP_intLiteral($1, @1.first_line); }
-    | ID    { $$ = makeEXP_identifier($1, @1.first_line); }
+PrimaryExpression:  CONSTANT
+    | ID
     | FunctionCall
     | '(' Expression ')'
 
@@ -53,12 +39,12 @@ UnaryExpression:    PrimaryExpression
     | '-' UnaryExpression
 
 MultiplicativeExpression:   UnaryExpression
-    | MultiplicativeExpression '*' UnaryExpression { $$ = makeEXP_multiplication($1, $3, @1.first_line); }
-    | MultiplicativeExpression '/' UnaryExpression { $$ = makeEXP_division($1, $3, @1.first_line); }
+    | MultiplicativeExpression '*' UnaryExpression
+    | MultiplicativeExpression '/' UnaryExpression 
 
 AdditiveExpression: MultiplicativeExpression
-    | AdditiveExpression '+' AdditiveExpression { $$ = makeEXP_addition($1, $3, @1.first_line); }
-    | AdditiveExpression '-' AdditiveExpression { $$ = makeEXP_subtraction($1, $3, @1.first_line); }
+    | AdditiveExpression '+' AdditiveExpression {$$ = addition($1, $3);}
+    | AdditiveExpression '-' AdditiveExpression
 
 ComparisonExpression:   AdditiveExpression
     | AdditiveExpression LT AdditiveExpression
@@ -104,7 +90,7 @@ FunctionParameter:  Type ID
 FunctionParameterList:  FunctionParameter
     | FunctionParameter ',' FunctionParameterList
 
-VariableDefinition: Type ID '=' CONSTANT ';' { install($2); }
+VariableDefinition: Type ID '=' CONSTANT ';'
 
 VariableDefinitionList:
     | VariableDefinition VariableDefinitionList
@@ -114,15 +100,14 @@ FunctionStatementList:  ReturnStatement
 
 FunctionBody:   VariableDefinitionList FunctionStatementList
 
-FunctionDefinition: ReturnType ID '(' FunctionParameterList ')' '{' FunctionBody '}' { install($2); }
-    | ReturnType ID '(' VOID ')' '{' FunctionBody '}' { install($2); }
+FunctionDefinition: ReturnType ID '(' FunctionParameterList ')' '{' FunctionBody '}'
+    | ReturnType ID '(' VOID ')' '{' FunctionBody '}'
 
 FunctionDefinitionList:
     | FunctionDefinition FunctionDefinitionList
 
 Program:    FunctionDefinitionList MainFunction FunctionDefinitionList
 %% 
-int lineno;
 int main(int argc, char** argv)
 {   extern FILE *yyin;
     ++argv; --argc;
