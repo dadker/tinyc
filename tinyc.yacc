@@ -39,22 +39,22 @@ UnaryExpression:    PrimaryExpression
     | '-' UnaryExpression
 
 MultiplicativeExpression:   UnaryExpression
-    | MultiplicativeExpression '*' UnaryExpression
+    | MultiplicativeExpression '*' UnaryExpression 
     | MultiplicativeExpression '/' UnaryExpression 
 
 AdditiveExpression: MultiplicativeExpression
     | AdditiveExpression '+' AdditiveExpression {$$ = addition($1, $3);}
-    | AdditiveExpression '-' AdditiveExpression
+    | AdditiveExpression '-' AdditiveExpression {$$ = subtraction($1, $3);}
 
 ComparisonExpression:   AdditiveExpression
-    | AdditiveExpression LT AdditiveExpression
-    | AdditiveExpression LE AdditiveExpression
-    | AdditiveExpression GT AdditiveExpression
-    | AdditiveExpression GE AdditiveExpression
+    | AdditiveExpression LT AdditiveExpression {$$ = lessThan($1, $3);}
+    | AdditiveExpression LE AdditiveExpression {$$ = lessThanEqual($1, $3);}
+    | AdditiveExpression GT AdditiveExpression {$$ = greaterThan($1, $3);}
+    | AdditiveExpression GE AdditiveExpression {$$ = greaterThanEqual($1, $3);}
 
 Expression: ComparisonExpression
-    | ComparisonExpression EQ ComparisonExpression
-    | ComparisonExpression NE ComparisonExpression
+    | ComparisonExpression EQ ComparisonExpression {$$ = equal($1, $3);)
+    | ComparisonExpression NE ComparisonExpression {$$ = notEqual($1, $3);}
 
 AssignmentStatment: ID '=' Expression ';'
 
