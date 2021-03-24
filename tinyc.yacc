@@ -53,17 +53,17 @@ ComparisonExpression:   AdditiveExpression
     | AdditiveExpression GE AdditiveExpression {$$ = greaterThanEqual($1, $3);}
 
 Expression: ComparisonExpression
-    | ComparisonExpression EQ ComparisonExpression {$$ = equal($1, $3);)
+    | ComparisonExpression EQ ComparisonExpression {$$ = equal($1, $3);}
     | ComparisonExpression NE ComparisonExpression {$$ = notEqual($1, $3);}
 
-AssignmentStatment: ID '=' Expression ';'
+AssignmentStatment: ID '=' Expression ';' {$$ = assign($1, $3);}
 
 IfStatement:    IF '(' Expression ')' Statement
     | IF '(' Expression ')' Statement ELSE Statement
 
 WhileStatement: WHILE '(' Expression ')' Statement
 
-ReturnStatement:    RETURN ';'
+ReturnStatement:    RETURN ';' {$$ = return($2);}
     | RETURN Expression ';'
 
 StatementList:
