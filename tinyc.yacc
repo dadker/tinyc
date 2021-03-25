@@ -17,13 +17,23 @@
 %type <node> AssignmentStatment IfStatement WhileStatement ReturnStatement StatementList BlockStatement EmptyStatement Statement
 %type <node> ReturnType FunctionParameter FunctionParameterList VariableDefinition VariableDefinitionList FunctionStatementList FunctionBody FunctionDefinition
 %type <node> FunctionDefinitionList MainFunction Program
+
+%left  '+'  '-'
+%left  '*'  '/'
+
 %%
+
+
 Type: INT
     | CHAR
     | FLOAT
 
-PrimaryExpression:  CONSTANT {$$ = intLiteral($1);}
-    | ID
+
+
+
+
+PrimaryExpression:  CONSTANT                            { $$ = intLiteral($1);              }
+    | ID                                                { $$ = identifier($1);              }
     | FunctionCall
     | '(' Expression ')'
 
@@ -39,46 +49,46 @@ UnaryExpression:    PrimaryExpression
     | '-' UnaryExpression
 
 MultiplicativeExpression:   UnaryExpression
-    | MultiplicativeExpression '*' UnaryExpression {$$ = multiply($1, $3);}
-    | MultiplicativeExpression '/' UnaryExpression {$$ = divide($1, $3);}
+    | MultiplicativeExpression '*' UnaryExpression      { $$ = multiply($1, $3);            }
+    | MultiplicativeExpression '/' UnaryExpression      { $$ = divide($1, $3);              }
 
 AdditiveExpression: MultiplicativeExpression
-    | AdditiveExpression '+' AdditiveExpression {$$ = addition($1, $3);}
-    | AdditiveExpression '-' AdditiveExpression {$$ = subtraction($1, $3);}
+    | AdditiveExpression '+' AdditiveExpression         { $$ = addition($1, $3);            }
+    | AdditiveExpression '-' AdditiveExpression         { $$ = subtraction($1, $3);         }
 
 ComparisonExpression:   AdditiveExpression
-    | AdditiveExpression LT AdditiveExpression {$$ = lessThan($1, $3);}
-    | AdditiveExpression LE AdditiveExpression {$$ = lessThanEqual($1, $3);}
-    | AdditiveExpression GT AdditiveExpression {$$ = greaterThan($1, $3);}
-    | AdditiveExpression GE AdditiveExpression {$$ = greaterThanEqual($1, $3);}
+    | AdditiveExpression LT AdditiveExpression          { $$ = lessThan($1, $3);            }
+    | AdditiveExpression LE AdditiveExpression          { $$ = lessThanEqual($1, $3);       }
+    | AdditiveExpression GT AdditiveExpression          { $$ = greaterThan($1, $3);         }
+    | AdditiveExpression GE AdditiveExpression          { $$ = greaterThanEqual($1, $3);    }
 
 Expression: ComparisonExpression
-    | ComparisonExpression EQ ComparisonExpression {$$ = equal($1, $3);}
-    | ComparisonExpression NE ComparisonExpression {$$ = notEqual($1, $3);}
+    | ComparisonExpression EQ ComparisonExpression      { $$ = equal($1, $3);               }
+    | ComparisonExpression NE ComparisonExpression      { $$ = notEqual($1, $3);            }
 
-AssignmentStatment: ID '=' Expression ';' {$$ = assign($1, $3);}
 
-IfStatement:    IF '(' Expression ')' Statement {$$ = ifStatement($3, $5);  printAST($$);}
-    | IF '(' Expression ')' Statement ELSE Statement {$$ = ifElseStatement($3, $5, $7);}
 
-WhileStatement: WHILE '(' Expression ')' Statement {$$ = whileStatement($3, $5);}
 
-ReturnStatement:    RETURN ';' 
-    | RETURN Expression ';' {$$ = ret($2);}
 
-StatementList:
-    | Statement StatementList {$$ = statementList($1, $2);}
+StatementList:                                          { $$ = NULL                         }
+    | Statement StatementList                           { $$ = statementList($1, $2);       }
 
-BlockStatement: '{' StatementList '}'
+Statement:  ID '=' Expression ';'                       { $$ = assign($1, $3);              }
+    | IF '(' Expression ')' Statement                   { $$ = ifStatement($3, $5);         }
+    | IF '(' Expression ')' Statement ELSE Statement    { $$ = ifElseStatement($3, $5, $7); }
+    | WHILE '(' Expression ')' Statement                { $$ = whileStatement($3, $5);      }
+    | RETURN ';'                                        {                                   }
+    | RETURN Expression ';'                             { $$ = ret($2);                     }
+    | '{' StatementList '}'                             {                                   }
+    | ;                                                 {                                   }
 
-EmptyStatement: ';'
 
-Statement:  AssignmentStatment
-    | IfStatement
-    | WhileStatement
-    | ReturnStatement
-    | BlockStatement
-    | EmptyStatement
+
+
+
+
+
+
 
 MainFunction:   MAIN '(' VOID ')' '{' FunctionBody '}'
 
@@ -100,14 +110,16 @@ FunctionStatementList:  ReturnStatement
 
 FunctionBody:   VariableDefinitionList FunctionStatementList
 
-FunctionDefinition: ReturnType ID '(' FunctionParameterList ')' '{' FunctionBody '}'
+FunctionDefinition: ReturnType ID '(' FunctionParameterList ')' '{' FunctionBody '}' {$$ = functionDefinition();}
     | ReturnType ID '(' VOID ')' '{' FunctionBody '}'
 
-FunctionDefinitionList:
-    | FunctionDefinition FunctionDefinitionList
+FunctionDefinitionList: {$$ = NULL;}
+    | FunctionDefinition FunctionDefinitionList {$$ = functionList($1, $2);}
 
-Program:    FunctionDefinitionList MainFunction FunctionDefinitionList
+Program:    FunctionDefinitionList MainFunction FunctionDefinitionList {$$ = program($1, $2, $3);}
 %% 
+
+
 int main(int argc, char** argv)
 {   extern FILE *yyin;
     ++argv; --argc;

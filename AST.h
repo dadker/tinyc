@@ -2,7 +2,7 @@ typedef struct AST AST;
 
 struct AST {
     enum {k_IntLiteral, k_Identifier, k_Addition, k_Subtraction, k_multiply, k_divide,  k_lessThan, k_lessThanEqual, k_greaterThan, k_greaterThanEqual, k_equal, k_notEqual, k_return, k_assign,
-            k_if, k_ifElse, k_while, k_statementList, k_program} kind;
+            k_if, k_ifElse, k_while, k_statementList, k_program, k_functionList} kind;
     union {
         char *identifier;
         int intLiteral;
@@ -182,6 +182,15 @@ AST *program(AST *node1, AST *node2, AST *node3)
     return e;
 }
 
+AST *functionList(AST *node1, AST *node2)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_functionList;
+    e->val.binary.lhs = node1;
+    e->val.binary.rhs = node2;
+    return e;
+}
+
 void printAST(AST *e) {
     switch(e->kind) {
         case k_IntLiteral:
@@ -219,11 +228,11 @@ void printAST(AST *e) {
             printf(")");
             break;
         case k_lessThan:
-            printf("(");
+            printf("");
             printAST(e->val.binary.lhs);
-            printf("<");
+            printf(" < ");
             printAST(e->val.binary.rhs);
-            printf(")");
+            printf("");
             break;
         case k_lessThanEqual:
             printf("(");
@@ -261,7 +270,7 @@ void printAST(AST *e) {
             printf(")");
             break;
         case k_return:
-            printf("(");
+            printf("RETURN");
             printAST(e->val.binary.lhs);
             printf(";");
             break;
