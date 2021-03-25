@@ -5,14 +5,14 @@
 #include "AST.h"
 %}
 %union{
-    int intval;
-    char *id;
+    int intValue;
+    char* id;
     struct AST *node;
 }
 %start Program
 %token CHAR ELSE FLOAT IF INT RETURN VOID WHILE MAIN EQ GE GT LE LT NE
-%token <intval> CONSTANT;
-%token <id>     ID;
+%token <intValue> CONSTANT
+%token <id> ID
 %type <node> PrimaryExpression FunctionArgList FunctionCall UnaryExpression MultiplicativeExpression AdditiveExpression ComparisonExpression Expression
 %type <node> AssignmentStatment IfStatement WhileStatement ReturnStatement StatementList BlockStatement EmptyStatement Statement
 %type <node> ReturnType FunctionParameter FunctionParameterList VariableDefinition VariableDefinitionList FunctionStatementList FunctionBody FunctionDefinition
@@ -22,7 +22,7 @@ Type: INT
     | CHAR
     | FLOAT
 
-PrimaryExpression:  CONSTANT
+PrimaryExpression:  CONSTANT {$$ = intLiteral($1);}
     | ID
     | FunctionCall
     | '(' Expression ')'
@@ -39,8 +39,8 @@ UnaryExpression:    PrimaryExpression
     | '-' UnaryExpression
 
 MultiplicativeExpression:   UnaryExpression
-    | MultiplicativeExpression '*' UnaryExpression 
-    | MultiplicativeExpression '/' UnaryExpression 
+    | MultiplicativeExpression '*' UnaryExpression {$$ = multiply($1, $3);}
+    | MultiplicativeExpression '/' UnaryExpression {$$ = divide($1, $3);}
 
 AdditiveExpression: MultiplicativeExpression
     | AdditiveExpression '+' AdditiveExpression {$$ = addition($1, $3);}
@@ -58,16 +58,16 @@ Expression: ComparisonExpression
 
 AssignmentStatment: ID '=' Expression ';' {$$ = assign($1, $3);}
 
-IfStatement:    IF '(' Expression ')' Statement
-    | IF '(' Expression ')' Statement ELSE Statement
+IfStatement:    IF '(' Expression ')' Statement {$$ = ifStatement($3, $5);  printAST($$);}
+    | IF '(' Expression ')' Statement ELSE Statement {$$ = ifElseStatement($3, $5, $7);}
 
-WhileStatement: WHILE '(' Expression ')' Statement
+WhileStatement: WHILE '(' Expression ')' Statement {$$ = whileStatement($3, $5);}
 
-ReturnStatement:    RETURN ';' {$$ = ret($2);}
-    | RETURN Expression ';'
+ReturnStatement:    RETURN ';' 
+    | RETURN Expression ';' {$$ = ret($2);}
 
 StatementList:
-    | Statement StatementList
+    | Statement StatementList {$$ = statementList($1, $2);}
 
 BlockStatement: '{' StatementList '}'
 

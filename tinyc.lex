@@ -21,7 +21,7 @@ while       { return WHILE;     }
 "!="        { return NE;        }
 ">"         { return GT;        }
 "<"	        { return LT;        }
-{DIGIT}+    { yylval.intval = atoi(yytext); 
+{DIGIT}+    { yylval.intValue = atoi(yytext); 
                 return CONSTANT; }
 {ID}        { yylval.id = (char *) strdup(yytext);
                 return ID; }
