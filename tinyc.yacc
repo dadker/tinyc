@@ -3,9 +3,24 @@
 #include <stdlib.h>
 #include <string.h>
 #include "AST.h"
+#include "ST.h"
 
 int yylex();
 int yyerror(const char* s);
+
+int install ( char *sym_name )
+{  symrec *s;
+   s = getsym (sym_name);
+   if (s == 0)
+        s = putsym (sym_name);
+   else {
+          printf( "%s is already defined\n", sym_name );
+   }
+}
+int context_check( char *sym_name )
+{ if ( getsym( sym_name ) == 0 ) 
+     printf( "%s is an undeclared identifier\n", sym_name );
+}
 %}
 
 %union{
