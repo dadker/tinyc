@@ -28,5 +28,5 @@ while       { return WHILE;     }
 [ \t\n]+
 .           { return yytext[0]; } 
 %%
-int yywrap(void){}
+int yywrap(void){return 0;}
 

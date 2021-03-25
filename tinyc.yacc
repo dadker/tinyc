@@ -127,4 +127,5 @@ int main(int argc, char** argv)
 int yyerror(const char *str)
 {
     fprintf(stderr,"error: %s\n",str);
+    return 0;
 }
