@@ -1,15 +1,38 @@
 typedef struct AST AST;
 
 struct AST {
-    enum {k_IntLiteral, k_Identifier, k_Addition, k_Subtraction, k_multiply, k_divide,  k_lessThan, k_lessThanEqual, k_greaterThan, k_greaterThanEqual, k_equal, k_notEqual, k_return, k_assign,
-            k_if, k_ifElse, k_while, k_statementList, k_program, k_functionList} kind;
+    enum {k_amp, k_argList, k_IntLiteral, k_Identifier, k_args, k_noArgs, k_parens, k_positive, 
+    k_negative, k_multiply, k_divide, k_addition, k_subtraction, k_lessThan, k_lessThanEqual, 
+    k_greaterThan, k_greaterThanEqual, k_equal, k_notEqual, k_assign, k_if, k_ifElse, k_while, 
+    k_ret, k_retExp, k_statementList, k_block, k_empty, k_typeInt, k_typeChar, k_typeFloat, 
+    k_param, k_paramList, k_varList, k_functionStatementList, k_functionDefinition, k_voidFunction,
+    k_functionDefinitionList, k_mainFunction, k_program, k_typeVoid, k_def, k_functionBody} kind;
     union {
         char *identifier;
         int intLiteral;
         struct { AST *lhs; AST *rhs; } binary;
-        struct { AST *node1; AST *node2; AST *node3; } trinary;
+        struct { AST *lhs; AST *mhs; AST *rhs; } trinary;
+        struct { AST *lhs; AST *mlhs; AST *mrhs; AST *rhs; } quad;
     } val;
 };
+
+AST *amp(AST *node1)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_amp;
+    e->val.binary.lhs = node1;
+    e->val.binary.rhs = NULL;
+    return e;
+}
+
+AST *argList(AST *node1, AST *node2)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_argList;
+    e->val.binary.lhs = node1;
+    e->val.binary.rhs = node2;
+    return e;
+}
 
 AST *intLiteral(int intLiteral)
 {
@@ -27,21 +50,48 @@ AST *identifier(char* identifier)
     return e;
 }
 
-AST *addition(AST *node1, AST *node2)
+AST *args(AST *node1, AST *node2)
 {
     AST *e = malloc(sizeof(AST));
-    e->kind = k_Addition;
+    e->kind = k_args;
     e->val.binary.lhs = node1;
     e->val.binary.rhs = node2;
     return e;
 }
 
-AST *subtraction(AST *node1, AST *node2)
+AST *noArgs(AST *node1)
 {
     AST *e = malloc(sizeof(AST));
-    e->kind = k_Subtraction;
+    e->kind = k_noArgs;
     e->val.binary.lhs = node1;
-    e->val.binary.rhs = node2;
+    e->val.binary.rhs = NULL;
+    return e;
+}
+
+AST *parens(AST *node1)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_parens;
+    e->val.binary.lhs = node1;
+    e->val.binary.rhs = NULL;
+    return e;
+}
+
+AST *positive(AST *node1)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_positive;
+    e->val.binary.lhs = node1;
+    e->val.binary.rhs = NULL;
+    return e;
+}
+
+AST *negative(AST *node1)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_negative;
+    e->val.binary.lhs = node1;
+    e->val.binary.rhs = NULL;
     return e;
 }
 
@@ -58,6 +108,24 @@ AST *divide(AST *node1, AST *node2)
 {
     AST *e = malloc(sizeof(AST));
     e->kind = k_divide;
+    e->val.binary.lhs = node1;
+    e->val.binary.rhs = node2;
+    return e;
+}
+
+AST *addition(AST *node1, AST *node2)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_addition;
+    e->val.binary.lhs = node1;
+    e->val.binary.rhs = node2;
+    return e;
+}
+
+AST *subtraction(AST *node1, AST *node2)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_subtraction;
     e->val.binary.lhs = node1;
     e->val.binary.rhs = node2;
     return e;
@@ -126,15 +194,6 @@ AST *assign(AST *node1, AST *node2)
     return e;
 }
 
-AST *ret(AST *node1)
-{
-    AST *e = malloc(sizeof(AST));
-    e->kind = k_return;
-    e->val.binary.lhs = node1;
-    e->val.binary.rhs = NULL;
-    return e;
-}
-
 AST *ifStatement(AST *node1, AST *node2)
 {
     AST *e = malloc(sizeof(AST));
@@ -148,9 +207,9 @@ AST *ifElseStatement(AST *node1, AST *node2, AST *node3)
 {
     AST *e = malloc(sizeof(AST));
     e->kind = k_ifElse;
-    e->val.trinary.node1 = node1;
-    e->val.trinary.node2 = node2;
-    e->val.trinary.node3 = node3;
+    e->val.trinary.lhs = node1;
+    e->val.trinary.mhs = node2;
+    e->val.trinary.rhs = node3;
     return e;
 }
 
@@ -163,6 +222,24 @@ AST *whileStatement(AST *node1, AST *node2)
     return e;
 }
 
+AST *ret()
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_ret;
+    e->val.binary.lhs = NULL;
+    e->val.binary.rhs = NULL;
+    return e;
+}
+
+AST *retExp(AST *node1)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_retExp;
+    e->val.binary.lhs = node1;
+    e->val.binary.rhs = NULL;
+    return e;
+}
+
 AST *statementList(AST *node1, AST *node2)
 {
     AST *e = malloc(sizeof(AST));
@@ -172,139 +249,277 @@ AST *statementList(AST *node1, AST *node2)
     return e;
 }
 
-AST *program(AST *node1, AST *node2, AST *node3)
+AST *block(AST *node1)
 {
     AST *e = malloc(sizeof(AST));
-    e->kind = k_program;
-    e->val.trinary.node1 = node1;
-    e->val.trinary.node2 = node2;
-    e->val.trinary.node3 = node3;
+    e->kind = k_block;
+    e->val.binary.lhs = node1;
+    e->val.binary.rhs = NULL;
     return e;
 }
 
-AST *functionList(AST *node1, AST *node2)
+AST *empty()
 {
     AST *e = malloc(sizeof(AST));
-    e->kind = k_functionList;
+    e->kind = k_empty;
+    e->val.binary.lhs = NULL;
+    e->val.binary.rhs = NULL;
+    return e;
+}
+
+AST *typeInt()
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_typeInt;
+    e->val.binary.lhs = NULL;
+    e->val.binary.rhs = NULL;
+    return e;
+}
+
+AST *typeChar()
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_typeChar;
+    e->val.binary.lhs = NULL;
+    e->val.binary.rhs = NULL;
+    return e;
+}
+
+AST *typeFloat()
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_typeFloat;
+    e->val.binary.lhs = NULL;
+    e->val.binary.rhs = NULL;
+    return e;
+}
+
+AST *param(AST *node1, AST *node2)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_param;
     e->val.binary.lhs = node1;
     e->val.binary.rhs = node2;
     return e;
 }
 
-void printAST(AST *e) {
+AST *paramList(AST *node1, AST *node2)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_paramList;
+    e->val.binary.lhs = node1;
+    e->val.binary.rhs = node2;
+    return e;
+}
+
+AST *varList(AST *node1, AST *node2)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_varList;
+    e->val.binary.lhs = node1;
+    e->val.binary.rhs = node2;
+    return e;
+}
+
+AST *functionStatementList(AST *node1, AST *node2)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_functionStatementList;
+    e->val.binary.lhs = node1;
+    e->val.binary.rhs = node2;
+    return e;
+}
+
+AST *functionDefinition(AST *node1, AST *node2, AST *node3, AST *node4)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_functionDefinition;
+    e->val.quad.lhs = node1;
+    e->val.quad.mlhs = node2;
+    e->val.quad.mrhs = node3;
+    e->val.quad.rhs = node4;
+    return e;
+}
+
+AST *voidFunction(AST *node1, AST *node2, AST *node3)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_voidFunction;
+    e->val.trinary.lhs = node1;
+    e->val.trinary.mhs = node2;
+    e->val.trinary.rhs = node3;
+    return e;
+}
+
+AST *functionDefinitionList(AST *node1, AST *node2)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_functionDefinitionList;
+    e->val.binary.lhs = node1;
+    e->val.binary.rhs = node2;
+    return e;
+}
+
+AST *mainFunction(AST *node1)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_mainFunction;
+    e->val.binary.lhs = node1;
+    e->val.binary.rhs = NULL;
+    return e;
+}
+
+AST *program(AST *node1, AST *node2, AST *node3)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_program;
+    e->val.trinary.lhs = node1;
+    e->val.trinary.mhs = node2;
+    e->val.trinary.rhs = node3;
+    return e;
+}
+
+AST *typeVoid()
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_typeVoid;
+    e->val.binary.lhs = NULL;
+    e->val.binary.rhs = NULL;
+    return e;
+}
+
+AST *def(AST *node1, AST *node2, AST *node3)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_def;
+    e->val.trinary.lhs = node1;
+    e->val.trinary.mhs = node2;
+    e->val.trinary.rhs = node3;
+    return e;
+}
+
+AST *functionBody(AST *node1, AST *node2)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_functionBody;
+    e->val.binary.lhs = node1;
+    e->val.binary.rhs = node2;
+    return e;
+}
+
+void printAST(AST *e) { 
+    if (e == NULL) {
+        return;
+    }
     switch(e->kind) {
+        case k_amp:
+            printf("&");
+            printAST(e->val.binary.lhs);
+            break;
+        case k_argList:
+            printAST(e->val.binary.lhs);
+            printf(",");
+            printAST(e->val.binary.rhs);
+            break;
         case k_IntLiteral:
             printf("%i", e->val.intLiteral);
             break;
         case k_Identifier:
             printf("%s", e->val.identifier);
             break;
-        case k_Addition:
-            printf("(");
+        case k_args: 
             printAST(e->val.binary.lhs);
-            printf("+");
+            printf("(");
             printAST(e->val.binary.rhs);
             printf(")");
             break;
-        case k_Subtraction:
+        case k_noArgs:
+            printAST(e->val.binary.lhs);
+            printf("(");
+            printf(")");
+            break;
+        case k_parens: 
             printf("(");
             printAST(e->val.binary.lhs);
-            printf("-");
-            printAST(e->val.binary.rhs);
             printf(")");
+            break;
+        case k_positive:
+            printf("+");
+            printAST(e->val.binary.lhs);
+            break;
+        case k_negative:
+            printf("-");
+            printAST(e->val.binary.lhs);
             break;
         case k_multiply:
-            printf("(");
             printAST(e->val.binary.lhs);
             printf("*");
             printAST(e->val.binary.rhs);
-            printf(")");
             break;
         case k_divide:
-            printf("(");
             printAST(e->val.binary.lhs);
             printf("/");
             printAST(e->val.binary.rhs);
-            printf(")");
             break;
-        case k_lessThan:
-            printf("");
+        case k_addition:
             printAST(e->val.binary.lhs);
-            printf(" < ");
+            printf("+");
             printAST(e->val.binary.rhs);
-            printf("");
+            break;
+        case k_subtraction:
+            printAST(e->val.binary.lhs);
+            printf("-");
+            printAST(e->val.binary.rhs);
+            break;
+        case k_lessThan: 
+            printAST(e->val.binary.lhs);
+            printf("<");
+            printAST(e->val.binary.rhs);
             break;
         case k_lessThanEqual:
-            printf("(");
             printAST(e->val.binary.lhs);
             printf("<=");
             printAST(e->val.binary.rhs);
-            printf(")");
             break;
         case k_greaterThan:
-            printf("(");
             printAST(e->val.binary.lhs);
             printf(">");
             printAST(e->val.binary.rhs);
-            printf(")");
             break;
         case k_greaterThanEqual:
-            printf("(");
             printAST(e->val.binary.lhs);
             printf(">=");
             printAST(e->val.binary.rhs);
-            printf(")");
             break;
         case k_equal:
-            printf("(");
             printAST(e->val.binary.lhs);
             printf("==");
             printAST(e->val.binary.rhs);
-            printf(")");
             break;
         case k_notEqual:
-            printf("(");
             printAST(e->val.binary.lhs);
             printf("!=");
             printAST(e->val.binary.rhs);
-            printf(")");
-            break;
-        case k_return:
-            printf("RETURN");
-            printAST(e->val.binary.lhs);
-            printf(";");
             break;
         case k_assign:
-            printAST(e->val.binary.lhs);
-            printf("=");
-            printAST(e->val.binary.rhs);
-            printf(";");
-            break;
+        
         case k_if:
-            printf("IF (");
-            printAST(e->val.binary.lhs);
-            printf(")");
-            printAST(e->val.binary.rhs);
-            break;
+        
         case k_ifElse:
-            printf("IF (");
-            printAST(e->val.trinary.node1);
-            printf(")");
-            printAST(e->val.trinary.node2);
-            printf("ELSE");
-            printAST(e->val.trinary.node3);
-            break;
+        
         case k_while:
+        
+        case k_ret:
+        
+        case k_retExp:
 
-            break;
         case k_statementList:
+        
+        case k_block:
+        
+        case k_empty:
 
-            break;
-        case k_program:
-
-            break;
         default:
-
             break;
     }
 }

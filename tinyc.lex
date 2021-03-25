@@ -14,7 +14,7 @@ int         { return INT;       }
 return      { return RETURN;    }
 void        { return VOID;      }
 while       { return WHILE;     }
-"int main"  { return MAIN;      }
+"int main"        { return MAIN;      }
 "<="        { return LE;        }
 ">="        { return GE;        }
 "=="        { return EQ;        }
