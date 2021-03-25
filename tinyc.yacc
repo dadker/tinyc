@@ -4,17 +4,19 @@
 #include <string.h>
 #include "AST.h"
 %}
+
 %union{
     int intValue;
     char* id;
     struct AST *node;
 }
+
 %start Program
 %token CHAR ELSE FLOAT IF INT RETURN VOID WHILE MAIN EQ GE GT LE LT NE
 %token <intValue> CONSTANT
 %token <id> ID
-%type <node> PrimaryExpression FunctionArgList FunctionCall UnaryExpression MultiplicativeExpression AdditiveExpression ComparisonExpression Expression
-%type <node> AssignmentStatment IfStatement WhileStatement ReturnStatement StatementList BlockStatement EmptyStatement Statement
+%type <node> FunctionArgList UnaryExpression MultiplicativeExpression AdditiveExpression ComparisonExpression Expression
+%type <node> Statement
 %type <node> ReturnType FunctionParameter FunctionParameterList VariableDefinition VariableDefinitionList FunctionStatementList FunctionBody FunctionDefinition
 %type <node> FunctionDefinitionList MainFunction Program
 
@@ -23,32 +25,20 @@
 
 %%
 
+FunctionArgList: '&' ID                                 {                                   }
+    | Expression                                        {                                   }
+    | Expression ',' FunctionArgList                    {                                   }
 
-Type: INT
-    | CHAR
-    | FLOAT
-
-
-
-
-
-PrimaryExpression:  CONSTANT                            { $$ = intLiteral($1);              }
+UnaryExpression: CONSTANT                               { $$ = intLiteral($1);              }
     | ID                                                { $$ = identifier($1);              }
-    | FunctionCall
-    | '(' Expression ')'
+    | FunctionCall                                      {                                   }
+    | ID '(' FunctionArgList ')'                        {                                   }
+    | ID '(' ')'                                        {                                   }
+    | '(' Expression ')'                                {                                   }
+    | '+' UnaryExpression                               {                                   }
+    | '-' UnaryExpression                               {                                   }
 
-FunctionArgList:    '&' ID
-    | Expression
-    | Expression ',' FunctionArgList
-
-FunctionCall:   ID '(' FunctionArgList ')'
-    | ID '(' ')'
-
-UnaryExpression:    PrimaryExpression
-    | '+' UnaryExpression
-    | '-' UnaryExpression
-
-MultiplicativeExpression:   UnaryExpression
+MultiplicativeExpression: UnaryExpression               {                                   }
     | MultiplicativeExpression '*' UnaryExpression      { $$ = multiply($1, $3);            }
     | MultiplicativeExpression '/' UnaryExpression      { $$ = divide($1, $3);              }
 
@@ -90,33 +80,39 @@ Statement:  ID '=' Expression ';'                       { $$ = assign($1, $3);  
 
 
 
-MainFunction:   MAIN '(' VOID ')' '{' FunctionBody '}'
-
 ReturnType: VOID
-    | Type
+    | INT
+    | CHAR
+    | FLOAT
 
-FunctionParameter:  Type ID
-
-FunctionParameterList:  FunctionParameter
-    | FunctionParameter ',' FunctionParameterList
-
-VariableDefinition: Type ID '=' CONSTANT ';'
+FunctionParameterList: INT ID
+    | CHAR ID
+    | FLOAT ID
+    | INT ID ',' FunctionParameterList
+    | CHAR ID ',' FunctionParameterList
+    | FLOAT ID ',' FunctionParameterList
 
 VariableDefinitionList:
-    | VariableDefinition VariableDefinitionList
+    | INT ID '=' CONSTANT ';' VariableDefinitionList
+    | CHAR ID '=' CONSTANT ';' VariableDefinitionList
+    | FLOAT ID '=' CONSTANT ';' VariableDefinitionList
 
-FunctionStatementList:  ReturnStatement
-    | Statement FunctionStatementList
+FunctionStatementList: RETURN ';'
+    | RETURN Expression ';'
+    | Statement FunctionStatementList  
 
-FunctionBody:   VariableDefinitionList FunctionStatementList
+FunctionDefinition: ReturnType ID '(' FunctionParameterList ')' '{' VariableDefinitionList FunctionStatementList '}'    {$$ = functionDefinition();}
+    | ReturnType ID '(' VOID ')' '{' VariableDefinitionList FunctionStatementList '}'
 
-FunctionDefinition: ReturnType ID '(' FunctionParameterList ')' '{' FunctionBody '}' {$$ = functionDefinition();}
-    | ReturnType ID '(' VOID ')' '{' FunctionBody '}'
 
-FunctionDefinitionList: {$$ = NULL;}
+
+FunctionDefinitionList:                                                                 {$$ = NULL;}
     | FunctionDefinition FunctionDefinitionList {$$ = functionList($1, $2);}
 
-Program:    FunctionDefinitionList MainFunction FunctionDefinitionList {$$ = program($1, $2, $3);}
+MainFunction: MAIN '(' VOID ')' '{' VariableDefinitionList FunctionStatementList '}'
+
+Program:    FunctionDefinitionList MainFunction FunctionDefinitionList                  {$$ = program($1, $2, $3);}
+
 %% 
 
 
