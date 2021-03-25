@@ -1,15 +1,19 @@
 struct symrec
 {
   char *name;
+  double val;
+  enum {t_int, t_float, t_char } type;
   struct symrec *next;
 };
 typedef struct symrec symrec;
 symrec *sym_table = (symrec *)0;
-symrec * putsym ( char *sym_name )
+symrec * putsym ( char *sym_name, int type, double val)
 {
   symrec *ptr;
   ptr = (symrec *) malloc (sizeof(symrec));
   ptr->name = (char *) malloc (strlen(sym_name)+1);
+  ptr->val = val;
+  ptr->type = type;
   strcpy (ptr->name,sym_name);
   ptr->next = (struct symrec *)sym_table;
   sym_table = ptr;

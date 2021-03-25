@@ -5,32 +5,63 @@
 #include "AST.h"
 #include "ST.h"
 
+int errors = 0;
 int yylex();
 int yyerror(const char* s);
+int type_check(char* sym_name);
 
-int install ( char *sym_name )
-{  symrec *s;
-   s = getsym (sym_name);
-   if (s == 0)
-        s = putsym (sym_name);
-   else {
-          printf( "%s is already defined\n", sym_name );
-   }
+
+int install ( char *sym_name, struct AST *node, float c )
+{  
+    symrec *s;
+    s = getsym (sym_name);
+    if (s == 0) {
+        s = putsym(sym_name, node->kind - 28, c);
+        type_check(sym_name);
+    } 
+    else 
+        printf( "%s is already defined\n", sym_name ); errors++;
 }
-int context_check( char *sym_name )
-{ if ( getsym( sym_name ) == 0 ) 
-     printf( "%s is an undeclared identifier\n", sym_name );
+
+int context_check ( char *sym_name )
+{ 
+    if ( getsym( sym_name ) == 0 ) 
+        printf( "%s is an undeclared identifier\n", sym_name ); errors++;
 }
+
+int type_check ( char *sym_name )
+{
+    symrec *s;
+    s = getsym (sym_name);
+    switch(s->type) {
+        case t_int:
+            if ( s->val != (int)s->val ) {
+                printf("Expected \'%s\' of type \'int\'. Got type \'float\'.\n", sym_name);
+                error++;
+            }
+            break;
+        case t_char:
+            if ( s->val != (int)s->val ) {
+                printf("Expected \'%s\' of type \'char\'. Got type \'float\'.\n", sym_name);
+                errors++;
+            }
+            break;
+        case t_float:
+
+            break;
+    }
+}
+
 %}
 
 %union{
-    int intValue;
+    float val;
     char* id;
     struct AST *node;
 }
 
 %token CHAR ELSE FLOAT IF INT RETURN VOID WHILE MAIN EQ NE LT LE GT GE
-%token <intValue> CONSTANT
+%token <val> CONSTANT
 %token <id> ID
 %type <node> FunctionArgList UnaryExpression MultiplicativeExpression AdditiveExpression ComparisonExpression Expression
 %type <node> AssignmentStatment IfStatement WhileStatement ReturnStatement StatementList BlockStatement EmptyStatement Statement
@@ -49,9 +80,9 @@ FunctionArgList: '&' ID                                                     { $$
     | Expression ',' FunctionArgList                                        { $$ = argList($1, $3);             }
 
 UnaryExpression: CONSTANT                                                   { $$ = intLiteral($1);              }
-    | ID                                                                    { $$ = identifier($1);              }
-    | ID '(' FunctionArgList ')'                                            { $$ = args(identifier($1), $3);    }
-    | ID '(' ')'                                                            { $$ = noArgs(identifier($1));      }
+    | ID                                                                    { $$ = identifier($1);              context_check($1);  }
+    | ID '(' FunctionArgList ')'                                            { $$ = args(identifier($1), $3);    context_check($1);  }
+    | ID '(' ')'                                                            { $$ = noArgs(identifier($1));      context_check($1);  }
     | '(' Expression ')'                                                    { $$ = parens($2);                  }
     | '+' UnaryExpression                                                   { $$ = positive($2);                }
     | '-' UnaryExpression                                                   { $$ = negative($2);                }
@@ -74,7 +105,7 @@ Expression: ComparisonExpression
     | ComparisonExpression EQ ComparisonExpression                          { $$ = equal($1, $3);               }
     | ComparisonExpression NE ComparisonExpression                          { $$ = notEqual($1, $3);            }
 
-AssignmentStatment: ID '=' Expression ';'                                   { $$ = assign(identifier($1), $3);  }
+AssignmentStatment: ID '=' Expression ';'                                   { $$ = assign(identifier($1), $3); context_check($1);  }
 
 IfStatement: IF '(' Expression ')' Statement %prec LOWER_THAN_ELSE          { $$ = ifStatement($3, $5);         }
     | IF '(' Expression ')' Statement ELSE Statement                        { $$ = ifElseStatement($3, $5, $7); }
@@ -110,7 +141,7 @@ FunctionParameter: Type ID                                                  { $$
 FunctionParameterList: FunctionParameter                                    
     | FunctionParameter ',' FunctionParameterList                           { $$ = paramList($1, $3);           }
 
-VariableDefinition: Type ID '=' CONSTANT ';'                                { $$ = def($1, identifier($2), intLiteral($4)); }
+VariableDefinition: Type ID '=' CONSTANT ';'                                { $$ = def($1, identifier($2), intLiteral($4)); install($2, $1, $4); }
 
 VariableDefinitionList:                                                     { $$ = NULL;                        }
     | VariableDefinition VariableDefinitionList                             { $$ = varList($1, $2);             }
@@ -126,7 +157,7 @@ FunctionDefinition: ReturnType ID '(' FunctionParameterList ')' '{' FunctionBody
 FunctionDefinitionList:                                                     { $$ = NULL;                        }
     | FunctionDefinition FunctionDefinitionList                             { $$ = functionDefinitionList($1, $2);}
 
-MainFunction: MAIN '(' VOID ')' '{' FunctionBody '}'                    { $$ = mainFunction($6);            }
+MainFunction: MAIN '(' VOID ')' '{' FunctionBody '}'                        { $$ = mainFunction($6);            }
 
 Program: FunctionDefinitionList MainFunction FunctionDefinitionList         { $$ = program($1, $2, $3);         }
 
