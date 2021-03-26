@@ -406,3 +406,218 @@ AST *functionBody(AST *node1, AST *node2)
     e->val.binary.rhs = node2;
     return e;
 }
+
+void printAST(AST *e) { 
+    if (e == NULL) {
+        return;
+    }
+    switch(e->kind) {
+        case k_amp:
+            printf("& ");
+            printAST(e->val.binary.lhs);
+            break;
+        case k_argList:
+            printAST(e->val.binary.lhs);
+            printf(", ");
+            printAST(e->val.binary.rhs);
+            break;
+        case k_IntLiteral:
+            printf("%i ", e->val.intLiteral);
+            break;
+        case k_Identifier:
+            printf("%s ", e->val.identifier);
+            break;
+        case k_args: 
+            printAST(e->val.binary.lhs);
+            printf("( ");
+            printAST(e->val.binary.rhs);
+            printf(") ");
+            break;
+        case k_noArgs:
+            printAST(e->val.binary.lhs);
+            printf("( ");
+            printf(") ");
+            break;
+        case k_parens: 
+            printf("( ");
+            printAST(e->val.binary.lhs);
+            printf(") ");
+            break;
+        case k_positive:
+            printf("+ ");
+            printAST(e->val.binary.lhs);
+            break;
+        case k_negative:
+            printf("- ");
+            printAST(e->val.binary.lhs);
+            break;
+        case k_multiply:
+            printAST(e->val.binary.lhs);
+            printf("* ");
+            printAST(e->val.binary.rhs);
+            break;
+        case k_divide:
+            printAST(e->val.binary.lhs);
+            printf("/ ");
+            printAST(e->val.binary.rhs);
+            break;
+        case k_addition:
+            printAST(e->val.binary.lhs);
+            printf("+ ");
+            printAST(e->val.binary.rhs);
+            break;
+        case k_subtraction:
+            printAST(e->val.binary.lhs);
+            printf("- ");
+            printAST(e->val.binary.rhs);
+            break;
+        case k_lessThan: 
+            printAST(e->val.binary.lhs);
+            printf("< ");
+            printAST(e->val.binary.rhs);
+            break;
+        case k_lessThanEqual:
+            printAST(e->val.binary.lhs);
+            printf("<= ");
+            printAST(e->val.binary.rhs);
+            break;
+        case k_greaterThan:
+            printAST(e->val.binary.lhs);
+            printf("> ");
+            printAST(e->val.binary.rhs);
+            break;
+        case k_greaterThanEqual:
+            printAST(e->val.binary.lhs);
+            printf(">= ");
+            printAST(e->val.binary.rhs);
+            break;
+        case k_equal:
+            printAST(e->val.binary.lhs);
+            printf("== ");
+            printAST(e->val.binary.rhs);
+            break;
+        case k_notEqual:
+            printAST(e->val.binary.lhs);
+            printf("!= ");
+            printAST(e->val.binary.rhs);
+            break;
+        case k_assign:
+            printAST(e->val.binary.lhs);
+            printf("= ");
+            printAST(e->val.binary.rhs);
+            printf(";\n");
+            break;
+        case k_if:
+            printf("if ( ");
+            printAST(e->val.binary.lhs);
+            printf(")\n");
+            printAST(e->val.binary.rhs);
+            break;     
+        case k_ifElse:
+            printf("if ( ");
+            printAST(e->val.trinary.lhs);
+            printf(")\n");
+            printAST(e->val.trinary.mhs);
+            printf("else\n");
+            printAST(e->val.trinary.rhs);
+            break; 
+        case k_while:
+            printf("while ( ");
+            printAST(e->val.binary.lhs);
+            printf(")\n");
+            printAST(e->val.binary.rhs);
+            break;
+        case k_ret:
+            printf("return;\n");
+            break;
+        case k_retExp:
+            printf("return ");
+            printAST(e->val.binary.lhs);
+            printf(";\n");
+            break;
+        case k_statementList:
+            printAST(e->val.binary.lhs);
+            printAST(e->val.binary.rhs);
+            break;
+        case k_block:
+            printf("{\n");
+            printAST(e->val.binary.lhs);
+            printf("}");
+            break;
+        case k_empty:
+            printf(";\n");
+            break;
+        case k_typeInt:
+            printf("int ");
+            break;
+        case k_typeFloat:
+            printf("float ");
+            break;
+        case k_typeChar:
+            printf("char ");
+            break;
+        case k_param:
+            printAST(e->val.binary.lhs);
+            printAST(e->val.binary.rhs);
+            break;
+        case k_paramList:
+            printAST(e->val.binary.lhs);
+            printf(", ");
+            printAST(e->val.binary.rhs);
+            break;        
+        case k_varList:
+            printAST(e->val.binary.lhs);
+            printAST(e->val.binary.rhs);
+            break;
+        case k_functionStatementList:
+            printAST(e->val.binary.lhs);
+            printAST(e->val.binary.rhs);
+            break;
+        case k_functionDefinition: 
+            printAST(e->val.quad.lhs);
+            printAST(e->val.quad.mlhs);
+            printf("( ");
+            printAST(e->val.quad.mrhs);
+            printf(") {\n");
+            printAST(e->val.quad.rhs);
+            printf("}\n");
+            break;
+        case k_voidFunction:
+            printAST(e->val.trinary.lhs);
+            printAST(e->val.trinary.mhs);
+            printf("( void ) {\n");
+            printAST(e->val.trinary.rhs);
+            printf("}\n");
+            break;
+        case k_functionDefinitionList:
+            printAST(e->val.binary.lhs);
+            printAST(e->val.binary.rhs);
+            break;
+        case k_mainFunction:
+            printf("int main (void) {\n");
+            printAST(e->val.binary.lhs);
+            printf("}\n");
+            break;
+        case k_program:
+            printAST(e->val.trinary.lhs);
+            printAST(e->val.trinary.mhs);
+            printAST(e->val.trinary.rhs);
+            break;
+        case k_typeVoid:
+            printf("void ");
+            break;
+        case k_def:
+            printAST(e->val.trinary.lhs);
+            printAST(e->val.trinary.mhs);
+            printf("= ");
+            printAST(e->val.trinary.rhs);
+            printf(";\n");
+            break;
+        case k_functionBody:
+            printAST(e->val.binary.lhs);
+            printAST(e->val.binary.rhs);
+            break;
+        default:
+            break;
+    }
+}

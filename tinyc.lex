@@ -2,7 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include "y.tab.h"
+extern int line_num;
 %}
+%option noyywrap
 %%
 char        { return CHAR;      }
 else        { return ELSE;      }
@@ -24,8 +26,8 @@ while       { return WHILE;     }
 [0-9]+"."[0-9]+         { yylval.val = atof(yytext); return CONSTANT;       }
 \'(\\.|[^"\\])\'        { return CONSTANT;                                  }
 \"(\\.|[^"\\])*\"       { return CONSTANT;                                  }
-[ \t\n]+
+[ \t]+
+\n          { line_num++; }
 .           { return yytext[0]; } 
 %%
-int yywrap(void){return 0;}
 
