@@ -167,6 +167,7 @@ int main(int argc, char** argv)
 {   extern FILE *yyin;
     ++argv; --argc;
     yyin = fopen(argv[0], "r");
+    printf(".text\n\n.globl main\n\n");
     yyparse();
 } 
 

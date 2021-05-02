@@ -532,9 +532,9 @@ void printAST(AST *e) {
             printf("\tret\n");
             break;
         case k_retExp:
-            printf("\tmov %%eax, ");
+            printf("\tmovl $");
             printAST(e->val.binary.lhs);
-            printf("\n");
+            printf(", %%eax \n");
             printf("\tpopq %%rbp\n");
             printf("\tret\n");
             //printAST(e->val.binary.lhs);
