@@ -422,7 +422,7 @@ void printAST(AST *e) {
             printAST(e->val.binary.rhs);
             break;
         case k_IntLiteral:
-            printf("%i ", e->val.intLiteral);
+            printf("%i", e->val.intLiteral);
             break;
         case k_Identifier:
             printf("%s ", e->val.identifier);
@@ -528,12 +528,16 @@ void printAST(AST *e) {
             printAST(e->val.binary.rhs);
             break;
         case k_ret:
-            printf("return;\n");
+            printf("\tpopq %%rbp\n");
+            printf("\tret\n");
             break;
         case k_retExp:
-            printf("return ");
+            printf("\tmov %%eax, ");
             printAST(e->val.binary.lhs);
-            printf(";\n");
+            printf("\n");
+            printf("\tpopq %%rbp\n");
+            printf("\tret\n");
+            //printAST(e->val.binary.lhs);
             break;
         case k_statementList:
             printAST(e->val.binary.lhs);
@@ -594,9 +598,10 @@ void printAST(AST *e) {
             printAST(e->val.binary.rhs);
             break;
         case k_mainFunction:
-            printf("int main (void) {\n");
+            printf("main:\n");
+            printf("\tpushq %%rbp\n");
+            printf("\tmovq %%rsp, %%rbp\n");
             printAST(e->val.binary.lhs);
-            printf("}\n");
             break;
         case k_program:
             printAST(e->val.trinary.lhs);
