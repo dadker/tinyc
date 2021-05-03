@@ -9,12 +9,6 @@ int anotherTest(int z) {
 }
 
 int main(void) {
-<<<<<<< HEAD
     printf("Hello.");
-=======
-    int x = 5;
-    int y = 6;
-    test();
->>>>>>> 892454e31efd7b4e7e6435a5e6d71462c09c7079
     return 0;
 }
