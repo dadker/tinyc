@@ -14,4 +14,4 @@ lex.yy.c:
 	flex tinyc.lex
 
 clean:
-	rm -f a.out lex.yy.c y.tab.c y.tab.h y.output
+	rm -f a.out lex.yy.c y.tab.c y.tab.h y.output tinyc.s tinyc.out
