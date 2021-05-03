@@ -7,6 +7,7 @@ char body[2048] = "";
 char head[2048] = "";
 int data_offset = 0;
 int isFunction = 0;
+int printToHead = 0;
 int data_location()
 {
     data_offset -= 4;
@@ -18,7 +19,12 @@ void emit(char * s, ...) {
   char s1[2048];
   vsprintf(s1, s, args);
   va_end(args);
-  strcat(body, s1);
+  if (printToHead) {
+    strcat(head, s1);
+  }
+  else {
+    strcat(body, s1);
+  }
 }
 
 struct symrec
