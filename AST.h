@@ -428,7 +428,7 @@ void printAST(AST *e) {
             printf("\tmov $%i, %%eax\n", e->val.intLiteral);
             break;
         case k_Identifier:
-            printf("\tmov %i(%%rbp), %%eax\n", offset);
+            printf("\tmov %i(%%rbp), %%eax\n", getsym(e->val.identifier)->offset);
             //printf("\t%s\n",getsym(e->val.identifier)->name);
             //printf("%s ", e->val.identifier);
             break;
