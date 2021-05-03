@@ -2,6 +2,7 @@ struct symrec
 {
   char *name;
   double val;
+  int offset;
   enum {t_int, t_float, t_char } type;
   enum {t_variable, t_function, t_param} other;
   struct symrec *next;
@@ -16,6 +17,7 @@ symrec * putsym ( char *sym_name, int type, double val, int otherType)
   ptr->val = val;
   ptr->type = type;
   ptr->other = otherType;
+  ptr->offset = data_location();
   strcpy (ptr->name,sym_name);
   ptr->next = (struct symrec *)sym_table;
   sym_table = ptr;
