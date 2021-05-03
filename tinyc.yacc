@@ -167,8 +167,14 @@ int main(int argc, char** argv)
 {   extern FILE *yyin;
     ++argv; --argc;
     yyin = fopen(argv[0], "r");
-    printf(".text\n\n.globl main\n\n");
+    FILE *pFile;
+    pFile=fopen("tinyc.s", "w");
+    strcat(head, ".text\n\n.globl main\n\n");
     yyparse();
+    fprintf(pFile, "%s", head);
+    fprintf(pFile, "%s", body);
+    fclose(pFile);
+    //printf(".text\n\n.globl main\n\n");
 } 
 
 int yyerror(const char *str)

@@ -425,10 +425,10 @@ void printAST(AST *e) {
             break;
         case k_IntLiteral:
             //printf("%i", e->val.intLiteral);
-            printf("\tmov $%i, %%eax\n", e->val.intLiteral);
+            emit_body("\tmov $%i, %%eax\n", e->val.intLiteral);
             break;
         case k_Identifier:
-            printf("\tmov %i(%%rbp), %%eax\n", getsym(e->val.identifier)->offset);
+            emit_body("\tmov %i(%%rbp), %%eax\n", getsym(e->val.identifier)->offset);
             //printf("\t%s\n",getsym(e->val.identifier)->name);
             //printf("%s ", e->val.identifier);
             break;
@@ -456,49 +456,49 @@ void printAST(AST *e) {
         case k_negative:
             //printf("- ");
             printAST(e->val.binary.lhs);
-            printf("\tneg %%eax\n");
+            emit_body("\tneg %%eax\n");
             break;
         case k_multiply:
             printAST(e->val.binary.lhs);
-            printf("\tmovl %%eax, %i(%%rbp)\n", data_offset);
+            emit_body("\tmovl %%eax, %i(%%rbp)\n", data_offset);
             data_offset -= 4;
             //printf("* ");
             printAST(e->val.binary.rhs);
-            printf("\tmovl %i(%%rbp), %%ebx\n", data_offset);
+            emit_body("\tmovl %i(%%rbp), %%ebx\n", data_offset);
             data_offset += 4;
-            printf("\timul %%ebx, %%eax\n");
+            emit_body("\timul %%ebx, %%eax\n");
             break;
         case k_divide:
             printAST(e->val.binary.lhs);
-            printf("\tmovl %%eax, %i(%%rbp)\n", data_offset);
+            emit_body("\tmovl %%eax, %i(%%rbp)\n", data_offset);
             data_offset -= 4;
             //printf("/ ");
             printAST(e->val.binary.rhs);
-            printf("\tmov %%eax, %%ecx\n");
-            printf("\tmovl %i(%%rbp), %%eax\n", data_offset);
+            emit_body("\tmov %%eax, %%ecx\n");
+            emit_body("\tmovl %i(%%rbp), %%eax\n", data_offset);
             data_offset += 4;
-            printf("\tmov %%edx, 0\n");
-            printf("\tdiv %%ecx\n");
+            emit_body("\tmov %%edx, 0\n");
+            emit_body("\tdiv %%ecx\n");
             break;
         case k_addition:
             printAST(e->val.binary.lhs);
-            printf("\tmovl %%eax, %i(%%rbp)\n", data_offset);
+            emit_body("\tmovl %%eax, %i(%%rbp)\n", data_offset);
             data_offset -= 4;
             //printf("+ ");
             printAST(e->val.binary.rhs);
-            printf("\tmovl %i(%%rbp), %%ebx\n", data_offset);
+            emit_body("\tmovl %i(%%rbp), %%ebx\n", data_offset);
             data_offset += 4;
-            printf("\tadd %%ebx, %%eax\n");
+            emit_body("\tadd %%ebx, %%eax\n");
             break;
         case k_subtraction:
             printAST(e->val.binary.lhs);
-            printf("\tmovl %%eax, %i(%%rbp)\n", data_offset);
+            emit_body("\tmovl %%eax, %i(%%rbp)\n", data_offset);
             data_offset -= 4;
             //printf("- ");
             printAST(e->val.binary.rhs);
-            printf("\tmovl %i(%%rbp), %%ebx\n", data_offset);
+            emit_body("\tmovl %i(%%rbp), %%ebx\n", data_offset);
             data_offset += 4;
-            printf("\tsub %%ebx, %%eax\n");
+            emit_body("\tsub %%ebx, %%eax\n");
             break;
         case k_lessThan: 
             printAST(e->val.binary.lhs);
@@ -534,7 +534,7 @@ void printAST(AST *e) {
             printAST(e->val.binary.lhs);
             //printf("= ");
             printAST(e->val.binary.rhs);
-            printf("\tmovl %%eax, %i(%%rbp)\n", data_offset);
+            emit_body("\tmovl %%eax, %i(%%rbp)\n", data_offset);
             data_offset -= 4;
             //printf(";\n");
             break;
@@ -559,13 +559,13 @@ void printAST(AST *e) {
             printAST(e->val.binary.rhs);
             break;
         case k_ret:
-            printf("\tpopq %%rbp\n");
-            printf("\tret\n");
+            emit_body("\tpopq %%rbp\n");
+            emit_body("\tret\n");
             break;
         case k_retExp:
             printAST(e->val.binary.lhs);
-            printf("\tpopq %%rbp\n");
-            printf("\tret\n");
+            emit_body("\tpopq %%rbp\n");
+            emit_body("\tret\n");
             //printAST(e->val.binary.lhs);
             break;
         case k_statementList:
@@ -578,7 +578,7 @@ void printAST(AST *e) {
             printf("}");
             break;
         case k_empty:
-            printf("\tnop\n");
+            emit_body("\tnop\n");
             break;
         case k_typeInt:
             //printf("int ");
@@ -627,9 +627,9 @@ void printAST(AST *e) {
             printAST(e->val.binary.rhs);
             break;
         case k_mainFunction:
-            printf("main:\n");
-            printf("\tpushq %%rbp\n");
-            printf("\tmovq %%rsp, %%rbp\n");
+            emit_head("main:\n");
+            emit_body("\tpushq %%rbp\n");
+            emit_body("\tmovq %%rsp, %%rbp\n");
             printAST(e->val.binary.lhs);
             break;
         case k_program:
@@ -645,7 +645,7 @@ void printAST(AST *e) {
             printAST(e->val.trinary.mhs);
             //printf("= ");
             printAST(e->val.trinary.rhs);
-            printf("\tmovl %%eax, %i(%%rbp)\n", data_offset);
+            emit_body("\tmovl %%eax, %i(%%rbp)\n", data_offset);
             data_offset -= 4;
             //printf(";\n");
             break;
