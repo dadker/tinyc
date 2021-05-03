@@ -446,9 +446,9 @@ void printAST(AST *e) {
             printf(") ");
             break;
         case k_parens: 
-            printf("( ");
+            //printf("( ");
             printAST(e->val.binary.lhs);
-            printf(") ");
+            //printf(") ");
             break;
         case k_positive:
             printf("+ ");
@@ -482,7 +482,7 @@ void printAST(AST *e) {
             //printf("- ");
             printAST(e->val.binary.rhs);
             printf("\tpop %%ebx\n");
-            printf("\tadd %%ebx, %%eax\n");
+            printf("\tsub %%ebx, %%eax\n");
             break;
         case k_lessThan: 
             printAST(e->val.binary.lhs);
