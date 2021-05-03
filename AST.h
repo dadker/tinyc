@@ -692,6 +692,7 @@ void printAST(AST *e) {
         case k_printf:
             // move into right registers
             printAST(e->val.binary.lhs);
+            emit("movl $0, %%eax");
             emit("\tlea .LC%i(%%rip), %%rdi\n", numOfStrings++);
             emit("\tcall printf@PLT\n");
             break;
