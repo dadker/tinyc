@@ -171,7 +171,7 @@ int main(int argc, char** argv)
     yyin = fopen(argv[0], "r");
     FILE *pFile;
     pFile=fopen("tinyc.s", "w");
-    strcat(head, ".text\n\n.globl main\n\n");
+    strcat(head, "\t.text\n\n\t.globl main\n\n");
     yyparse();
     fprintf(pFile, "%s", head);
     fprintf(pFile, "%s", body);
