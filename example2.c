@@ -1,4 +1,5 @@
 int main(void) {
     int x = 5;
-    return (5 / 1) + 2;
+    int y = 6;
+    return (y / x) + 2;
 }
