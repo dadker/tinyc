@@ -6,21 +6,13 @@
 char body[2048] = "";
 char head[2048] = "";
 int data_offset = 0;
+int isFunction = 0;
 int data_location()
 {
     data_offset -= 4;
     return data_offset;
 }
-void emit_head(char * s, ...) {
-  va_list args;
-  va_start(args, s);
-  char s1[2048];
-  vsprintf(s1, s, args);
-  //vprintf(s, args);
-  va_end(args);
-  strcat(head, s1);
-}
-void emit_body(char * s, ...) {
+void emit(char * s, ...) {
   va_list args;
   va_start(args, s);
   char s1[2048];
