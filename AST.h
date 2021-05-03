@@ -1,3 +1,9 @@
+int data_offset = 0;
+int data_location()
+{
+    return data_offset++;
+}
+
 typedef struct AST AST;
 
 struct AST {
