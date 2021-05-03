@@ -5,7 +5,7 @@
 #include "y.tab.h"
 extern int line_num;
 char ch_arr[10][100];
-int numStrings = 0;
+extern int numStrings;
 %}
 %option noyywrap
 %%
@@ -35,10 +35,13 @@ scanf       { return SCANF;     }
 \n          { line_num++; }
 .           { return yytext[0]; } 
 %%
-int printStrings() 
+void printStrings(char * s) 
 {
     for (int i = 0; i < numStrings; i++ )
     {
-        printf(".LC%d:\n\t.string %s\n\n", i, ch_arr[i]);
+        char s1[1024];
+        sprintf(s1,".LC%d:\n\t.string %s\n\n", i, ch_arr[i]);
+        strcat(s, s1);
     }
+    return;
 }

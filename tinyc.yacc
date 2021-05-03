@@ -6,11 +6,10 @@
 #include "ST.h"
 
 int line_num = 1;
+int numStrings = 0;
 int yylex();
 int yyerror(const char* s);
 int type_check(char* sym_name);
-extern int printStrings();
-
 
 int install ( char *sym_name, struct AST *node, float c, int type )
 {  
@@ -175,10 +174,14 @@ int main(int argc, char** argv)
     pFile=fopen("tinyc.s", "w");
     strcat(head, "\t.text\n\n\t.globl main\n\n");
     yyparse();
+    printToHead = 1;
+    char s[2048];
+    printStrings(s);
+    emit(s);
+    printToHead = 0;
     fprintf(pFile, "%s", head);
     fprintf(pFile, "%s", body);
     fclose(pFile);
-    printStrings();
     //printf(".text\n\n.globl main\n\n");
 } 
 
