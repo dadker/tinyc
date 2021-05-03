@@ -8,6 +8,7 @@ char head[2048] = "";
 int data_offset = 0;
 int isFunction = 0;
 int printToHead = 0;
+int numOfStrings = 0;
 
 int data_location()
 {
