@@ -9,6 +9,7 @@ int line_num = 1;
 int yylex();
 int yyerror(const char* s);
 int type_check(char* sym_name);
+extern int printStrings();
 
 
 int install ( char *sym_name, struct AST *node, float c, int type )
@@ -129,7 +130,7 @@ Statement: AssignmentStatment
     | BlockStatement
     | EmptyStatement
     | PRINTF '(' FunctionArgList ')' ';'    { $$ = printfStatement($3); }
-    | SCANF '(' FunctionArgList ')' ';'     { $$ - scanfStatement($3); }
+    | SCANF '(' FunctionArgList ')' ';'     { $$ = scanfStatement($3); }
 
 Type: INT                                                                   { $$ = typeInt();                   }                                                             
     | CHAR                                                                  { $$ = typeChar();                  }  
@@ -166,7 +167,8 @@ Program: FunctionDefinitionList MainFunction FunctionDefinitionList         { $$
 %%
 
 int main(int argc, char** argv)
-{   extern FILE *yyin;
+{   
+    extern FILE *yyin;
     ++argv; --argc;
     yyin = fopen(argv[0], "r");
     FILE *pFile;
@@ -176,6 +178,7 @@ int main(int argc, char** argv)
     fprintf(pFile, "%s", head);
     fprintf(pFile, "%s", body);
     fclose(pFile);
+    printStrings();
     //printf(".text\n\n.globl main\n\n");
 } 
 
