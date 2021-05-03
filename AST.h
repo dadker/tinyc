@@ -8,7 +8,7 @@ struct AST {
     k_greaterThan, k_greaterThanEqual, k_equal, k_notEqual, k_assign, k_if, k_ifElse, k_while, 
     k_ret, k_retExp, k_statementList, k_block, k_empty, k_typeInt, k_typeFloat, k_typeChar, 
     k_param, k_paramList, k_varList, k_functionStatementList, k_functionDefinition, k_voidFunction,
-    k_functionDefinitionList, k_mainFunction, k_program, k_typeVoid, k_def, k_functionBody} kind;
+    k_functionDefinitionList, k_mainFunction, k_program, k_typeVoid, k_def, k_functionBody, k_printf, k_scanf} kind;
     union {
         char *identifier;
         int intLiteral;
@@ -409,6 +409,24 @@ AST *functionBody(AST *node1, AST *node2)
     return e;
 }
 
+AST *printfStatement(AST *node1)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_printf;
+    e->val.binary.lhs = node1;
+    e->val.binary.rhs = NULL;
+    return e;
+}
+
+AST *scanfStatement(AST *node1)
+{
+    AST *e = malloc(sizeof(AST));
+    e->kind = k_scanf;
+    e->val.binary.lhs = node1;
+    e->val.binary.rhs = NULL;
+    return e;
+}
+
 void printAST(AST *e) { 
     if (e == NULL) {
         return;
@@ -445,8 +463,8 @@ void printAST(AST *e) {
             break;
         case k_noArgs:
             printAST(e->val.binary.lhs);
-            printf("( ");
-            printf(") ");
+            //printf("( ");
+            //printf(") ");
             break;
         case k_parens: 
             //printf("( ");
@@ -507,7 +525,7 @@ void printAST(AST *e) {
             break;
         case k_lessThan: 
             printAST(e->val.binary.lhs);
-            printf("< ");
+            //printf("< ");
             printAST(e->val.binary.rhs);
             break;
         case k_lessThanEqual:
@@ -527,8 +545,13 @@ void printAST(AST *e) {
             break;
         case k_equal:
             printAST(e->val.binary.lhs);
-            printf("== ");
+            emit("\tmovl %%eax, %i(%%rbp)\n", data_offset);
+            data_offset -= 4;
+            //printf("== ");
             printAST(e->val.binary.rhs);
+            emit("\tmovl %i(%%rbp), %%ebx\n", data_offset);
+            emit("\ttest %%eax, %%ebx");
+            data_offset += 4;
             break;
         case k_notEqual:
             printAST(e->val.binary.lhs);
@@ -665,6 +688,16 @@ void printAST(AST *e) {
         case k_functionBody:
             printAST(e->val.binary.lhs);
             printAST(e->val.binary.rhs);
+            break;
+        case k_printf:
+            // move into right registers
+            printAST(e->val.binary.lhs);
+            emit("\tcall printf@PLT\n");
+            break;
+        case k_scanf:
+            // move into right resisters
+            printAST(e->val.binary.lhs);
+            emit("\tcall scanf@PLT\n");
             break;
         default:
             break;

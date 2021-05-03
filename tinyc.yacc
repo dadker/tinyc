@@ -6,10 +6,10 @@
 #include "ST.h"
 
 int line_num = 1;
+int numStrings = 0;
 int yylex();
 int yyerror(const char* s);
 int type_check(char* sym_name);
-
 
 int install ( char *sym_name, struct AST *node, float c, int type )
 {  
@@ -60,7 +60,7 @@ int type_check ( char *sym_name )
     struct AST *node;
 }
 
-%token CHAR ELSE FLOAT IF INT RETURN VOID WHILE MAIN EQ NE LT LE GT GE
+%token CHAR ELSE FLOAT IF INT RETURN VOID WHILE MAIN EQ NE LT LE GT GE PRINTF SCANF
 %token <val> CONSTANT
 %token <id> ID
 %type <node> FunctionArgList UnaryExpression MultiplicativeExpression AdditiveExpression ComparisonExpression Expression
@@ -128,6 +128,8 @@ Statement: AssignmentStatment
     | ReturnStatement
     | BlockStatement
     | EmptyStatement
+    | PRINTF '(' FunctionArgList ')' ';'    { $$ = printfStatement($3); }
+    | SCANF '(' FunctionArgList ')' ';'     { $$ = scanfStatement($3); }
 
 Type: INT                                                                   { $$ = typeInt();                   }                                                             
     | CHAR                                                                  { $$ = typeChar();                  }  
@@ -164,13 +166,19 @@ Program: FunctionDefinitionList MainFunction FunctionDefinitionList         { $$
 %%
 
 int main(int argc, char** argv)
-{   extern FILE *yyin;
+{   
+    extern FILE *yyin;
     ++argv; --argc;
     yyin = fopen(argv[0], "r");
     FILE *pFile;
     pFile=fopen("tinyc.s", "w");
     strcat(head, "\t.text\n\n\t.globl main\n\n");
     yyparse();
+    printToHead = 1;
+    char s[2048];
+    printStrings(s);
+    emit(s);
+    printToHead = 0;
     fprintf(pFile, "%s", head);
     fprintf(pFile, "%s", body);
     fclose(pFile);

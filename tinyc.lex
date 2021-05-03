@@ -1,8 +1,11 @@
 %{
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "y.tab.h"
 extern int line_num;
+char ch_arr[10][100];
+extern int numStrings;
 %}
 %option noyywrap
 %%
@@ -14,6 +17,8 @@ int         { return INT;       }
 return      { return RETURN;    }
 void        { return VOID;      }
 while       { return WHILE;     }
+printf      { return PRINTF;    }
+scanf       { return SCANF;     }
 "int main"  { return MAIN;      }
 "<="        { return LE;        }
 ">="        { return GE;        }
@@ -25,8 +30,18 @@ while       { return WHILE;     }
 "0"|[1-9][0-9]*         { yylval.val = atof(yytext); return CONSTANT;       }
 [0-9]+"."[0-9]+         { yylval.val = atof(yytext); return CONSTANT;       }
 \'(\\.|[^"\\])\'        { return CONSTANT;                                  }
-\"(\\.|[^"\\])*\"       { return CONSTANT;                                  }
+\"(\\.|[^"\\])*\"       { strcpy(ch_arr[numStrings], yytext); numStrings++; return CONSTANT; }
 [ \t]+
 \n          { line_num++; }
 .           { return yytext[0]; } 
 %%
+void printStrings(char * s) 
+{
+    for (int i = 0; i < numStrings; i++ )
+    {
+        char s1[1024];
+        sprintf(s1,".LC%d:\n\t.string %s\n\n", i, ch_arr[i]);
+        strcat(s, s1);
+    }
+    return;
+}
