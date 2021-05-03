@@ -463,8 +463,8 @@ void printAST(AST *e) {
             break;
         case k_noArgs:
             printAST(e->val.binary.lhs);
-            printf("( ");
-            printf(") ");
+            //printf("( ");
+            //printf(") ");
             break;
         case k_parens: 
             //printf("( ");
@@ -525,7 +525,7 @@ void printAST(AST *e) {
             break;
         case k_lessThan: 
             printAST(e->val.binary.lhs);
-            printf("< ");
+            //printf("< ");
             printAST(e->val.binary.rhs);
             break;
         case k_lessThanEqual:
@@ -545,8 +545,13 @@ void printAST(AST *e) {
             break;
         case k_equal:
             printAST(e->val.binary.lhs);
-            printf("== ");
+            emit("\tmovl %%eax, %i(%%rbp)\n", data_offset);
+            data_offset -= 4;
+            //printf("== ");
             printAST(e->val.binary.rhs);
+            emit("\tmovl %i(%%rbp), %%ebx\n", data_offset);
+            emit("\ttest %%eax, %%ebx");
+            data_offset += 4;
             break;
         case k_notEqual:
             printAST(e->val.binary.lhs);
@@ -686,10 +691,12 @@ void printAST(AST *e) {
             break;
         case k_printf:
             // move into right registers
+            printAST(e->val.binary.lhs);
             emit("\tcall printf@PLT\n");
             break;
         case k_scanf:
             // move into right resisters
+            printAST(e->val.binary.lhs);
             emit("\tcall scanf@PLT\n");
             break;
         default:
