@@ -1,3 +1,4 @@
 int main(void) {
-    return 8 + (1 - 2);
+    int x = 5;
+    return (5 / 1) + 2;
 }

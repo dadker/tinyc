@@ -5,13 +5,17 @@
 main:
 	pushq %rbp
 	movq %rsp, %rbp
-	mov $8, %eax
+	mov $5, %eax
+	push %eax
+	mov $5, %eax
 	push %eax
 	mov $1, %eax
+	mov %eax, %ecx
+	pop %eax
+	mov %edx, 0
+	div %ecx
 	push %eax
 	mov $2, %eax
-	pop %ebx
-	sub %ebx, %eax
 	pop %ebx
 	add %ebx, %eax
 	popq %rbp

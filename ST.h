@@ -1,3 +1,12 @@
+# ifndef ST_H
+# define ST_H
+
+int data_offset = 0;
+int data_location()
+{
+    return data_offset++;
+}
+
 struct symrec
 {
   char *name;
@@ -32,3 +41,5 @@ symrec * getsym ( char *sym_name )
       return ptr;
   return 0;
 }
+
+#endif

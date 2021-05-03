@@ -1,8 +1,4 @@
-int data_offset = 0;
-int data_location()
-{
-    return data_offset++;
-}
+#include "ST.h"
 
 typedef struct AST AST;
 
@@ -432,7 +428,10 @@ void printAST(AST *e) {
             printf("\tmov $%i, %%eax\n", e->val.intLiteral);
             break;
         case k_Identifier:
-            printf("%s ", e->val.identifier);
+            getsym(e->val.identifier)->offset = data_offset;
+            data_offset -= 4;
+            //printf("\t%s\n",getsym(e->val.identifier)->name);
+            //printf("%s ", e->val.identifier);
             break;
         case k_args: 
             printAST(e->val.binary.lhs);
@@ -451,22 +450,32 @@ void printAST(AST *e) {
             //printf(") ");
             break;
         case k_positive:
-            printf("+ ");
+            //printf("+ ");
+            //Unary + does nothing
             printAST(e->val.binary.lhs);
             break;
         case k_negative:
-            printf("- ");
+            //printf("- ");
             printAST(e->val.binary.lhs);
+            printf("\tneg %%eax\n");
             break;
         case k_multiply:
             printAST(e->val.binary.lhs);
-            printf("* ");
+            printf("\tpush %%eax\n");
+            //printf("* ");
             printAST(e->val.binary.rhs);
+            printf("\tpop %%ebx\n");
+            printf("\timul %%ebx, %%eax\n");
             break;
         case k_divide:
             printAST(e->val.binary.lhs);
-            printf("/ ");
+            printf("\tpush %%eax\n");
+            //printf("/ ");
             printAST(e->val.binary.rhs);
+            printf("\tmov %%eax, %%ecx\n");
+            printf("\tpop %%eax\n");
+            printf("\tmov %%edx, 0\n");
+            printf("\tdiv %%ecx\n");
             break;
         case k_addition:
             printAST(e->val.binary.lhs);
@@ -516,9 +525,10 @@ void printAST(AST *e) {
             break;
         case k_assign:
             printAST(e->val.binary.lhs);
-            printf("= ");
+            //printf("= ");
             printAST(e->val.binary.rhs);
-            printf(";\n");
+            printf("\tpush %%eax\n");
+            //printf(";\n");
             break;
         case k_if:
             printf("if ( ");
@@ -560,16 +570,16 @@ void printAST(AST *e) {
             printf("}");
             break;
         case k_empty:
-            printf(";\n");
+            printf("\tnop\n");
             break;
         case k_typeInt:
-            printf("int ");
+            //printf("int ");
             break;
         case k_typeFloat:
-            printf("float ");
+            //printf("float ");
             break;
         case k_typeChar:
-            printf("char ");
+            //printf("char ");
             break;
         case k_param:
             printAST(e->val.binary.lhs);
@@ -625,9 +635,10 @@ void printAST(AST *e) {
         case k_def:
             printAST(e->val.trinary.lhs);
             printAST(e->val.trinary.mhs);
-            printf("= ");
+            //printf("= ");
             printAST(e->val.trinary.rhs);
-            printf(";\n");
+            printf("\tpush %%eax\n");
+            //printf(";\n");
             break;
         case k_functionBody:
             printAST(e->val.binary.lhs);
