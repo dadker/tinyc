@@ -422,7 +422,8 @@ void printAST(AST *e) {
             printAST(e->val.binary.rhs);
             break;
         case k_IntLiteral:
-            printf("%i", e->val.intLiteral);
+            //printf("%i", e->val.intLiteral);
+            printf("\tmov $%i, %%eax\n", e->val.intLiteral);
             break;
         case k_Identifier:
             printf("%s ", e->val.identifier);
@@ -463,13 +464,19 @@ void printAST(AST *e) {
             break;
         case k_addition:
             printAST(e->val.binary.lhs);
-            printf("+ ");
+            printf("\tpush %%eax\n");
+            //printf("+ ");
             printAST(e->val.binary.rhs);
+            printf("\tpop %%ebx\n");
+            printf("\tadd %%ebx, %%eax\n");
             break;
         case k_subtraction:
             printAST(e->val.binary.lhs);
-            printf("- ");
+            printf("\tpush %%eax\n");
+            //printf("- ");
             printAST(e->val.binary.rhs);
+            printf("\tpop %%ebx\n");
+            printf("\tadd %%ebx, %%eax\n");
             break;
         case k_lessThan: 
             printAST(e->val.binary.lhs);
@@ -532,9 +539,7 @@ void printAST(AST *e) {
             printf("\tret\n");
             break;
         case k_retExp:
-            printf("\tmovl $");
             printAST(e->val.binary.lhs);
-            printf(", %%eax \n");
             printf("\tpopq %%rbp\n");
             printf("\tret\n");
             //printAST(e->val.binary.lhs);
