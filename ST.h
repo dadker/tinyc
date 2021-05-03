@@ -4,7 +4,8 @@
 int data_offset = 0;
 int data_location()
 {
-    return data_offset++;
+    data_offset -= 4;
+    return data_offset;
 }
 
 struct symrec
