@@ -1,3 +1,9 @@
+tinyc.out: tinyc.s
+	gcc -o tinyc.out tinyc.s
+
+tinyc.s: a.out
+	./a.out example2.c > tinyc.s
+
 a.out: lex.yy.c y.tab.c
 	gcc lex.yy.c y.tab.c -o a.out
 
