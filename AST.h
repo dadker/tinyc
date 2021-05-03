@@ -685,10 +685,12 @@ void printAST(AST *e) {
             printAST(e->val.binary.rhs);
             break;
         case k_printf:
-
+            // move into right registers
+            emit("\tcall printf@PLT\n");
             break;
         case k_scanf:
-
+            // move into right resisters
+            emit("\tcall scanf@PLT\n");
             break;
         default:
             break;
