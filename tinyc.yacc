@@ -10,6 +10,7 @@ int numStrings = 0;
 int yylex();
 int yyerror(const char* s);
 int type_check(char* sym_name);
+void printStrings(char * s);
 
 int install ( char *sym_name, struct AST *node, float c, int type )
 {  
