@@ -14,6 +14,8 @@ int         { return INT;       }
 return      { return RETURN;    }
 void        { return VOID;      }
 while       { return WHILE;     }
+printf      { return PRINTF;    }
+scanf       { return SCANF;     }
 "int main"  { return MAIN;      }
 "<="        { return LE;        }
 ">="        { return GE;        }

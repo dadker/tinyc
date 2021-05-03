@@ -60,7 +60,7 @@ int type_check ( char *sym_name )
     struct AST *node;
 }
 
-%token CHAR ELSE FLOAT IF INT RETURN VOID WHILE MAIN EQ NE LT LE GT GE
+%token CHAR ELSE FLOAT IF INT RETURN VOID WHILE MAIN EQ NE LT LE GT GE PRINTF SCANF
 %token <val> CONSTANT
 %token <id> ID
 %type <node> FunctionArgList UnaryExpression MultiplicativeExpression AdditiveExpression ComparisonExpression Expression
@@ -128,6 +128,8 @@ Statement: AssignmentStatment
     | ReturnStatement
     | BlockStatement
     | EmptyStatement
+    | PRINTF '(' FunctionArgList ')' ';'    { $$ = printfStatement($3); }
+    | SCANF '(' FunctionArgList ')' ';'     { $$ - scanfStatement($3); }
 
 Type: INT                                                                   { $$ = typeInt();                   }                                                             
     | CHAR                                                                  { $$ = typeChar();                  }  
