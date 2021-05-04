@@ -444,7 +444,7 @@ void printAST(AST *e) {
         case k_IntLiteral:
             //printf("%i", e->val.intLiteral);
             if (inFunctionCall) {
-                emit("\tmov $%i, %%%s\n", e->val.intLiteral, registerLabels[registerCount]);
+                emit("\tmov $%i, %%%s\n", e->val.intLiteral, registerLabels[registerCount++]);
             }
             else {
                 emit("\tmov $%i, %%eax\n", e->val.intLiteral);
@@ -701,7 +701,7 @@ void printAST(AST *e) {
             printAST(e->val.binary.lhs);
             inFunctionCall = 0;
             registerCount = 0;
-            emit("movl $0, %%eax\n");
+            emit("\tmovl $0, %%eax\n");
             emit("\tlea .LC%i(%%rip), %%rdi\n", numOfStrings++);
             emit("\tcall printf@PLT\n");
             break;

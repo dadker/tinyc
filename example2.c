@@ -1,7 +1,5 @@
 int main(void) {
-    int x = 5;
-    int y = 6;
-    printf("Hello %d\n", 5);
+    printf("Hello %%d %%d\n", 5, 7);
     printf("World");
     return 0;
 }
