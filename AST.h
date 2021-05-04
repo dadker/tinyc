@@ -516,10 +516,11 @@ void printAST(AST *e) {
         case k_addition:
             printAST(e->val.binary.lhs);
             emit("\tmovl %%eax, %i(%%rbp)\n", data_offset);
+            int offset = data_offset;
             data_offset -= 4;
             //printf("+ ");
             printAST(e->val.binary.rhs);
-            emit("\tmovl %i(%%rbp), %%ebx\n", data_offset);
+            emit("\tmovl %i(%%rbp), %%ebx\n", offset);
             data_offset += 4;
             emit("\tadd %%ebx, %%eax\n");
             break;
