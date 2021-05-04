@@ -513,7 +513,7 @@ void printAST(AST *e) {
             emit("\tmov %%eax, %%ecx\n");
             emit("\tmovl %i(%%rbp), %%eax\n", offset);
             data_offset += 4;
-            emit("\tmov %%edx, 0\n");
+            emit("\tmov $0, %%edx\n");
             emit("\tdiv %%ecx\n");
             break;
         case k_addition:

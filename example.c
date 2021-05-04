@@ -1,11 +1,11 @@
 int main(void) {
-    int x = 7;
-    int running = 1;
-    while (running) {
-        x = x + 1;
-        if (x == 10) {
-            running = 0;
-        }
-    }
-    return x;
+    int x = 5;
+    printf("%%d\n", x);
+    x = 5 + 3;
+    printf("%%d\n", x);
+    x = 5 - 7;
+    printf("%%d\n", x); 
+    x = 5 / 2;
+    printf("%%d\n", x); 
+    return 0;
 }
