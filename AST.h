@@ -431,6 +431,7 @@ void printAST(AST *e) {
     if (e == NULL) {
         return;
     }
+    int offset;
     switch(e->kind) {
         case k_amp:
             printf("& ");
@@ -494,7 +495,7 @@ void printAST(AST *e) {
         case k_multiply:
             printAST(e->val.binary.lhs);
             emit("\tmovl %%eax, %i(%%rbp)\n", data_offset);
-            int offset = data_offset;
+            offset = data_offset;
             data_offset -= 4;
             //printf("* ");
             printAST(e->val.binary.rhs);
@@ -505,7 +506,7 @@ void printAST(AST *e) {
         case k_divide:
             printAST(e->val.binary.lhs);
             emit("\tmovl %%eax, %i(%%rbp)\n", data_offset);
-            int offset = data_offset;
+            offset = data_offset;
             data_offset -= 4;
             //printf("/ ");
             printAST(e->val.binary.rhs);
@@ -518,7 +519,7 @@ void printAST(AST *e) {
         case k_addition:
             printAST(e->val.binary.lhs);
             emit("\tmovl %%eax, %i(%%rbp)\n", data_offset);
-            int offset = data_offset;
+            offset = data_offset;
             data_offset -= 4;
             //printf("+ ");
             printAST(e->val.binary.rhs);
@@ -529,7 +530,7 @@ void printAST(AST *e) {
         case k_subtraction:
             printAST(e->val.binary.lhs);
             emit("\tmovl %%eax, %i(%%rbp)\n", data_offset);
-            int offset = data_offset;
+            offset = data_offset;
             data_offset -= 4;
             //printf("- ");
             printAST(e->val.binary.rhs);
