@@ -454,6 +454,9 @@ void printAST(AST *e) {
             if (isFunction) {
                 emit("%s:\n", getsym(e->val.identifier)->name);
             }
+            else if (inFunctionCall) {
+                emit("\tmov %i(%%rbp), %%%s\n", getsym(e->val.identifier)->offset, registerLabels[registerCount++]);
+            }
             else {
                 emit("\tmov %i(%%rbp), %%eax\n", getsym(e->val.identifier)->offset);
             }
