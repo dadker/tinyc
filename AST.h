@@ -697,7 +697,7 @@ void printAST(AST *e) {
         case k_printf:
             // move into right registers
             inFunctionCall = 1;
-            registerCount = 1;
+            registerCount = 0;
             printAST(e->val.binary.lhs);
             inFunctionCall = 0;
             registerCount = 0;
