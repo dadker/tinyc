@@ -537,7 +537,7 @@ void printAST(AST *e) {
             emit("\tmovl %i(%%rbp), %%ebx\n", offset);
             data_offset += 4;
             emit("\tsub %%ebx, %%eax\n");
-            emit("\tneg %%eax\n")
+            emit("\tneg %%eax\n");
             break;
         case k_lessThan: 
             printAST(e->val.binary.lhs);
