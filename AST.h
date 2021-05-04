@@ -455,9 +455,11 @@ void printAST(AST *e) {
                 emit("%s:\n", getsym(e->val.identifier)->name);
             }
             else if (inFunctionCall) {
+                currentOffset = getsym(e->val.identifier)->offset;
                 emit("\tmov %i(%%rbp), %%%s\n", getsym(e->val.identifier)->offset, registerLabels[registerCount++]);
             }
             else {
+                currentOffset = getsym(e->val.identifier)->offset;
                 emit("\tmov %i(%%rbp), %%eax\n", getsym(e->val.identifier)->offset);
             }
             //printf("\t%s\n",getsym(e->val.identifier)->name);
@@ -570,8 +572,9 @@ void printAST(AST *e) {
             printAST(e->val.binary.lhs);
             //printf("= ");
             printAST(e->val.binary.rhs);
-            emit("\tmovl %%eax, %i(%%rbp)\n", data_offset);
+            emit("\tmovl %%eax, %i(%%rbp)\n", currentOffset);
             data_offset -= 4;
+            currentOffset = 0;
             //printf(";\n");
             break;
         case k_if:

@@ -12,6 +12,7 @@ int numOfStrings = 0;
 char registerLabels[6][4] = {"rdi","rsi","rdx","rcx","r8","r9"};
 int registerCount = 0;
 int inFunctionCall = 0;
+int currentOffset = 0;
 
 int data_location()
 {
