@@ -9,6 +9,9 @@ int data_offset = 0;
 int isFunction = 0;
 int printToHead = 0;
 int numOfStrings = 0;
+char registerLabels[6][4] = {"rdi","rsi","rdx","rcx","r8","r9"};
+int registerCount = 0;
+int inFunctionCall = 0;
 
 int data_location()
 {
